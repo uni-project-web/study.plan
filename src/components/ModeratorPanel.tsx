@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, X, AlertCircle, Shield, Lock, Eye, EyeOff, Check, Key, Users } from 'lucide-react';
+import { MessageSquare, X, AlertCircle, Shield, Lock, Eye, EyeOff, Check, Key, Users, User, BookOpen } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../lib/supabase';
-import AdminLogin from './AdminLogin';
 import { Complaint } from '../types';
 
 interface AdminUser {

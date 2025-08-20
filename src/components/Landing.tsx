@@ -184,7 +184,7 @@ const Landing: React.FC = () => {
                   <div className="w-px h-12 bg-gray-200"></div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">{userStats.resolved_complaints}</div>
-                    <div className="text-sm text-gray-600">Issues Resolved</div>
+                    <div className="text-sm text-gray-600">Issues Solved</div>
                   </div>
                   <div className="w-px h-12 bg-gray-200"></div>
                   <div className="text-center">
