@@ -286,21 +286,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ adminUser }) => {
                         <div className={`mt-3 p-3 rounded border-l-4 border-blue-500 ${isDarkMode ? 'bg-gray-800' : 'bg-blue-50'}`}>
                           <div className={`text-sm font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-700'} mb-1`}>
                             Reply by {complaint.replied_by_name || 'Admin'}:
-                            {complaint.status === 'pending' && (
-                              <button
-                                onClick={() => markComplaintResolved(complaint.id)}
-                                className="p-1 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors duration-200"
-                                title="Mark as resolved"
-                              >
-                                <Check className="w-3 h-3" />
-                              </button>
-                            )}
                           </div>
                           <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             {complaint.admin_reply}
                           </p>
                         </div>
                       )}
+                      
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => markComplaintResolved(complaint.id)}
+                          className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors duration-200"
+                        >
+                          Issue Solved
+                        </button>
+                      </div>
                     </div>
                     
                     <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} text-right ml-4`}>
