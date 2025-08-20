@@ -98,25 +98,39 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Get user details for friends from auth.users first, then fallback to public.users
       const friendIds = friendsData.map(f => f.friend_id);
       
-      // Get user details from public.users table
-      const { data: usersData, error: usersError } = await supabase
+      // Get user details from auth.users table first
+      const { data: authUsersData, error: authUsersError } = await supabase.auth.admin.listUsers();
+      
+      // Get user details from public.users table as fallback
+      const { data: publicUsersData, error: publicUsersError } = await supabase
         .from('users')
         .select('id, name, email')
         .in('id', friendIds);
 
-      if (usersError) {
-        console.error('Error loading user details:', usersError);
+      if (publicUsersError) {
+        console.error('Error loading user details from public.users:', publicUsersError);
       }
 
       // Transform the data to match the Friend interface
       const transformedFriends = friendsData.map(f => {
-        const friendUser = usersData?.find(u => u.id === f.friend_id);
+        // Try to get user from auth.users first, then fallback to public.users
+        const authUser = authUsersData?.users?.find(u => u.id === f.friend_id);
+        const publicUser = publicUsersData?.find(u => u.id === f.friend_id);
+        
+        const friendName = authUser?.user_metadata?.name || 
+                          publicUser?.name || 
+                          authUser?.email?.split('@')[0] || 
+                          publicUser?.email?.split('@')[0] || 
+                          'Unknown User';
+        
+        const friendEmail = authUser?.email || publicUser?.email || '';
+        
         return {
           id: f.id,
           user_id: f.user_id,
           friend_id: f.friend_id,
-          friend_name: friendUser?.name || friendUser?.email?.split('@')[0] || 'Unknown User',
-          friend_email: friendUser?.email || '',
+          friend_name: friendName,
+          friend_email: friendEmail,
           created_at: f.created_at
         };
       });
@@ -152,25 +166,39 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Get user details for senders from auth.users first, then fallback to public.users
       const senderIds = requestsData.map(r => r.sender_id);
       
-      // Get user details from public.users table
-      const { data: usersData, error: usersError } = await supabase
+      // Get user details from auth.users table first
+      const { data: authUsersData, error: authUsersError } = await supabase.auth.admin.listUsers();
+      
+      // Get user details from public.users table as fallback
+      const { data: publicUsersData, error: publicUsersError } = await supabase
         .from('users')
         .select('id, name, email')
         .in('id', senderIds);
 
-      if (usersError) {
-        console.error('Error loading user details:', usersError);
+      if (publicUsersError) {
+        console.error('Error loading user details from public.users:', publicUsersError);
       }
 
       // Transform the data to match the FriendRequest interface
       const transformedRequests = requestsData.map(r => {
-        const senderUser = usersData?.find(u => u.id === r.sender_id);
+        // Try to get user from auth.users first, then fallback to public.users
+        const authUser = authUsersData?.users?.find(u => u.id === r.sender_id);
+        const publicUser = publicUsersData?.find(u => u.id === r.sender_id);
+        
+        const senderName = authUser?.user_metadata?.name || 
+                          publicUser?.name || 
+                          authUser?.email?.split('@')[0] || 
+                          publicUser?.email?.split('@')[0] || 
+                          'Unknown User';
+        
+        const senderEmail = authUser?.email || publicUser?.email || '';
+        
         return {
           id: r.id,
           sender_id: r.sender_id,
           receiver_id: r.receiver_id,
-          sender_name: senderUser?.name || senderUser?.email?.split('@')[0] || 'Unknown User',
-          sender_email: senderUser?.email || '',
+          sender_name: senderName,
+          sender_email: senderEmail,
           status: r.status as 'pending' | 'accepted' | 'rejected',
           created_at: r.created_at
         };
