@@ -409,14 +409,23 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       // Only create friendship if it doesn't already exist
       if (!existingFriendship || existingFriendship.length === 0) {
-        const { error: friendError } = await supabase
+        // Use upsert to handle potential duplicates gracefully
+        const { error: friendError1 } = await supabase
           .from('friends')
-          .insert([
+          .upsert(
             { user_id: request.receiver_id, friend_id: request.sender_id },
-            { user_id: request.sender_id, friend_id: request.receiver_id }
-          ]);
+            { onConflict: 'user_id,friend_id', ignoreDuplicates: true }
+          );
 
-        if (friendError) throw friendError;
+        const { error: friendError2 } = await supabase
+          .from('friends')
+          .upsert(
+            { user_id: request.sender_id, friend_id: request.receiver_id },
+            { onConflict: 'user_id,friend_id', ignoreDuplicates: true }
+          );
+
+        if (friendError1) throw friendError1;
+        if (friendError2) throw friendError2;
       }
 
       // Update request status
