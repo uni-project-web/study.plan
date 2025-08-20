@@ -84,13 +84,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           breakTime: settingsData.break_time
         });
       } else {
-        // Create default settings if none exist
+        // Create default settings if none exist using upsert with onConflict
         const { error: upsertError } = await supabase
           .from('user_settings')
           .upsert({
             user_id: user.id,
             work_time: 25,
             break_time: 5
+          }, {
+            onConflict: 'user_id'
           });
 
         if (upsertError) {

@@ -98,29 +98,14 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Get user details for friends from auth.users first, then fallback to public.users
       const friendIds = friendsData.map(f => f.friend_id);
       
-      // Try to get from auth.users via RPC function
-      const { data: authUsersData, error: authError } = await supabase.rpc('get_users_by_ids', {
-        user_ids: friendIds
-      });
+      // Get user details from public.users table
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', friendIds);
 
-      let usersData = authUsersData;
-      
-      // If RPC fails or returns incomplete data, fallback to public.users
-      if (authError || !authUsersData || authUsersData.length < friendIds.length) {
-        const { data: publicUsersData, error: publicError } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .in('id', friendIds);
-
-        if (!publicError && publicUsersData) {
-          // Merge auth users data with public users data
-          const mergedData = friendIds.map(id => {
-            const authUser = authUsersData?.find(u => u.id === id);
-            const publicUser = publicUsersData.find(u => u.id === id);
-            return authUser || publicUser || { id, name: 'Unknown User', email: '' };
-          });
-          usersData = mergedData;
-        }
+      if (usersError) {
+        console.error('Error loading user details:', usersError);
       }
 
       // Transform the data to match the Friend interface
@@ -167,29 +152,14 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Get user details for senders from auth.users first, then fallback to public.users
       const senderIds = requestsData.map(r => r.sender_id);
       
-      // Try to get from auth.users via RPC function
-      const { data: authUsersData, error: authError } = await supabase.rpc('get_users_by_ids', {
-        user_ids: senderIds
-      });
+      // Get user details from public.users table
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', senderIds);
 
-      let usersData = authUsersData;
-      
-      // If RPC fails or returns incomplete data, fallback to public.users
-      if (authError || !authUsersData || authUsersData.length < senderIds.length) {
-        const { data: publicUsersData, error: publicError } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .in('id', senderIds);
-
-        if (!publicError && publicUsersData) {
-          // Merge auth users data with public users data
-          const mergedData = senderIds.map(id => {
-            const authUser = authUsersData?.find(u => u.id === id);
-            const publicUser = publicUsersData.find(u => u.id === id);
-            return authUser || publicUser || { id, name: 'Unknown User', email: '' };
-          });
-          usersData = mergedData;
-        }
+      if (usersError) {
+        console.error('Error loading user details:', usersError);
       }
 
       // Transform the data to match the FriendRequest interface
@@ -251,29 +221,14 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Get user details for all session users
       const sessionUserIds = [...new Set(sessionsData.map(s => s.user_id))];
       
-      // Try to get from auth.users via RPC function first
-      const { data: authUsersData, error: authError } = await supabase.rpc('get_users_by_ids', {
-        user_ids: sessionUserIds
-      });
+      // Get user details from public.users table
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', sessionUserIds);
 
-      let usersData = authUsersData;
-      
-      // If RPC fails or returns incomplete data, fallback to public.users
-      if (authError || !authUsersData || authUsersData.length < sessionUserIds.length) {
-        const { data: publicUsersData, error: publicError } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .in('id', sessionUserIds);
-
-        if (!publicError && publicUsersData) {
-          // Merge auth users data with public users data
-          const mergedData = sessionUserIds.map(id => {
-            const authUser = authUsersData?.find(u => u.id === id);
-            const publicUser = publicUsersData.find(u => u.id === id);
-            return authUser || publicUser || { id, name: 'Unknown User', email: '' };
-          });
-          usersData = mergedData;
-        }
+      if (usersError) {
+        console.error('Error loading user details:', usersError);
       }
 
       // Map user details to sessions data
@@ -329,29 +284,14 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Get user details for all message users
       const userIds = [...new Set(messagesData.map(m => m.user_id))];
       
-      // Try to get from auth.users via RPC function first
-      const { data: authUsersData, error: authError } = await supabase.rpc('get_users_by_ids', {
-        user_ids: userIds
-      });
+      // Get user details from public.users table
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', userIds);
 
-      let usersData = authUsersData;
-      
-      // If RPC fails or returns incomplete data, fallback to public.users
-      if (authError || !authUsersData || authUsersData.length < userIds.length) {
-        const { data: publicUsersData, error: publicError } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .in('id', userIds);
-
-        if (!publicError && publicUsersData) {
-          // Merge auth users data with public users data
-          const mergedData = userIds.map(id => {
-            const authUser = authUsersData?.find(u => u.id === id);
-            const publicUser = publicUsersData.find(u => u.id === id);
-            return authUser || publicUser || { id, name: 'Unknown User', email: '' };
-          });
-          usersData = mergedData;
-        }
+      if (usersError) {
+        console.error('Error loading user details:', usersError);
       }
 
       // Map user details to messages data
